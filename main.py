@@ -58,7 +58,7 @@ if show_group:
     ax.plot(years, group_data, label='자치도 그룹', color='black', linestyle='--')
 
 # 그래프 범례 추가
-ax.legend()
+# ax.legend()
 
 # 그래프 표시 (Streamlit에서 matplotlib 그래프 표시)
 st.pyplot(fig)
