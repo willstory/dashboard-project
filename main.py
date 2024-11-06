@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 import matplotlib
 from matplotlib.widgets import CheckButtons
@@ -31,24 +32,35 @@ ax.set_title('Population Movement by Region Over Years')
 ax.set_xlabel('년도')
 ax.set_ylabel('인구 변동 추이')
 
-# 범례를 오른쪽에 표시
-# ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))
-
-# 체크 박스 생성 (그래프 오른쪽에 위치)
-ax_check = plt.axes([0.85, 0.3, 0.1, 0.4])  # (left, bottom, width, height)
+# 체크 박스 생성 (그래프 오른쪽 상단에 위치)
+ax_check = plt.axes([0.9, 0.7, 0.1, 0.3])  # (left, bottom, width, height)
 check = CheckButtons(ax_check, regions, [True] * len(regions))  # 초기 상태는 모두 활성화
+
+# 자치도 그룹을 추가하는 체크박스 생성
+ax_check_group = plt.axes([0.9, 0.4, 0.1, 0.3])  # 자치도 그룹 체크박스 위치
+check_group = CheckButtons(ax_check_group, ['자치도 그룹'], [
+                           True])  # 자치도 그룹 초기 상태는 활성화
+
+# 자치도 그룹 라인 생성 (세종특별자치시, 강원특별자치도, 전북특별자치도, 제주특별자치도)
+group_regions = ['세종특별자치시', '강원특별자치도', '전북특별자치도', '제주특별자치도']
+group_lines, = ax.plot(years, data_csv[group_regions].sum(
+    axis=1), label='자치도 그룹', color='black', linestyle='--')
 
 # 체크박스 클릭 시 동작 정의
 
 
-def func(label):
-    index = regions.tolist().index(label)
-    lines[index].set_visible(check.get_status()[index]
-                             )  # 체크박스 상태에 따라 라인 표시 여부 결정
+def func(label_total):
+    if label_total == '자치도 그룹':
+        group_lines.set_visible(check_group.get_status()[0])  # 자치도 그룹의 가시성 제어
+    else:
+        index = regions.tolist().index(label_total)
+        lines[index].set_visible(check.get_status()[index])  # 개별 지역 라인의 가시성 제어
     plt.draw()
 
 
+# 체크박스 클릭 이벤트
 check.on_clicked(func)
+check_group.on_clicked(func)
 
 # 그래프 표시
 plt.show()
