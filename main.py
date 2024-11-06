@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import matplotlib
 from matplotlib.widgets import CheckButtons
+from group import func
 
 # 한글 폰트 설정 (윈도우일 경우, 'Malgun Gothic', 맥일 경우 'AppleGothic' 사용)
 matplotlib.rcParams['font.family'] = 'Malgun Gothic'  # Windows의 기본 한글 폰트
@@ -47,15 +48,6 @@ group_lines, = ax.plot(years, data_csv[group_regions].sum(
     axis=1), label='자치도 그룹', color='black', linestyle='--')
 
 # 체크박스 클릭 시 동작 정의
-
-
-def func(label_total):
-    if label_total == '자치도 그룹':
-        group_lines.set_visible(check_group.get_status()[0])  # 자치도 그룹의 가시성 제어
-    else:
-        index = regions.tolist().index(label_total)
-        lines[index].set_visible(check.get_status()[index])  # 개별 지역 라인의 가시성 제어
-    plt.draw()
 
 
 # 체크박스 클릭 이벤트
