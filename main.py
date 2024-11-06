@@ -1,3 +1,4 @@
+import streamlit as st
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -19,6 +20,10 @@ data_csv.head()
 years = data_csv['년도']
 regions = data_csv.columns[1:]  # 지역 이름들
 
+# Streamlit 페이지 설정
+st.title('인구 이동 및 자치도 그룹 분석')
+st.write('각 지역별 인구 이동 변화를 그래프와 함께 확인할 수 있습니다.')
+
 # 그래프 크기 설정
 fig, ax = plt.subplots(figsize=(14, 8))
 
@@ -33,26 +38,27 @@ ax.set_title('Population Movement by Region Over Years')
 ax.set_xlabel('년도')
 ax.set_ylabel('인구 변동 추이')
 
-# 체크 박스 생성 (그래프 오른쪽 상단에 위치)
-ax_check = plt.axes([0.9, 0.7, 0.1, 0.3])  # (left, bottom, width, height)
-check = CheckButtons(ax_check, regions, [True] * len(regions))  # 초기 상태는 모두 활성화
+# 체크 박스 생성 (Streamlit 위젯)
+selected_regions = [
+    region for region in regions if st.checkbox(region, value=True)]
 
-# 자치도 그룹을 추가하는 체크박스 생성
-ax_check_group = plt.axes([0.9, 0.4, 0.1, 0.3])  # 자치도 그룹 체크박스 위치
-check_group = CheckButtons(ax_check_group, ['자치도 그룹'], [
-                           True])  # 자치도 그룹 초기 상태는 활성화
+# 자치도 그룹을 추가하는 체크박스
+show_group = st.checkbox('자치도 그룹', value=True)
 
 # 자치도 그룹 라인 생성 (세종특별자치시, 강원특별자치도, 전북특별자치도, 제주특별자치도)
 group_regions = ['세종특별자치시', '강원특별자치도', '전북특별자치도', '제주특별자치도']
-group_lines, = ax.plot(years, data_csv[group_regions].sum(
-    axis=1), label='자치도 그룹', color='black', linestyle='--')
+group_data = data_csv[group_regions].sum(axis=1)
 
-# 체크박스 클릭 시 동작 정의
+# 선택된 지역만 그래프에 표시
+for region in selected_regions:
+    ax.plot(years, data_csv[region], label=region)
 
+# 자치도 그룹 그래프를 표시할지 여부에 따라 표시
+if show_group:
+    ax.plot(years, group_data, label='자치도 그룹', color='black', linestyle='--')
 
-# 체크박스 클릭 이벤트
-check.on_clicked(func)
-check_group.on_clicked(func)
+# 그래프 범례 추가
+ax.legend()
 
-# 그래프 표시
-plt.show()
+# 그래프 표시 (Streamlit에서 matplotlib 그래프 표시)
+st.pyplot(fig)
